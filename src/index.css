@@ -1,0 +1,11 @@
+/* Define the hover effect for the icon */
+.link {
+  transition: transform 0.3s ease, color 0.3s ease;
+
+}
+
+.link:hover {
+  opacity: 0.8;
+  background-color: gary;
+
+}
