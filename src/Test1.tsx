@@ -16,20 +16,17 @@ const Test1 = () => {
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const handleClick = () => {
-    // Check if geolocation is available in the browser
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // If permission is granted, set the position to state
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           });
-          setError(null); // Clear any previous error
+          setError(null);
           console.log(position);
         },
         (err) => {
-          // If an error occurs (e.g., permission denied), handle it
           setLocation(null);
           setError(err.message);
         }
@@ -98,7 +95,7 @@ const Test1 = () => {
                   href={item.link}
                   className={`link ${
                     selectedLink === item.id ? "bg-secondary" : ""
-                  }`} // Conditionally apply active class
+                  }`}
                   style={styles.navItem}
                   onClick={() => setSelectedLink(item.id)}
                 >

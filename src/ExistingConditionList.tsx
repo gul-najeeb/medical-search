@@ -7,17 +7,14 @@ const conditionData = [
   { id: 3, name: 'Asthma' },
   { id: 4, name: 'Heart Disease' },
   { id: 5, name: 'Chronic Kidney Disease' },
-  // Add more conditions as needed
 ];
 
 const ExistingConditionList = ({ selectedConditions, setSelectedConditions }) => {
   const toggleCondition = (id) => {
     setSelectedConditions((prev) => {
       if (prev.includes(id)) {
-        // Deselect condition if already selected
         return prev.filter((conditionId) => conditionId !== id);
       } else {
-        // Select condition if not selected
         return [...prev, id];
       }
     });
@@ -50,7 +47,6 @@ const ExistingConditionList = ({ selectedConditions, setSelectedConditions }) =>
   );
 };
 
-// Styles for ExistingConditionList component
 const styles = {
   conditionList: {
     marginTop: '20px',
@@ -60,7 +56,7 @@ const styles = {
   },
   conditionColumn: {
     display: 'flex',
-    flexDirection: 'column', // Stack items vertically
+    flexDirection: 'column',
     gap: '10px',
     marginTop: '10px',
   },

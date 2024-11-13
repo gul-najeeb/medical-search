@@ -9,7 +9,6 @@ const symptomsData = [
   { id: 3, name: "Headache" },
   { id: 4, name: "Sore Throat" },
   { id: 5, name: "Fatigue" },
-  // Add more symptoms as needed
 ];
 
 const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms }) => {
@@ -17,10 +16,8 @@ const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms }) => {
     setSelectedSymptoms((prev) => {
       const alreadySelected = prev.find((item) => item.id === id);
       if (alreadySelected) {
-        // Remove symptom if already selected
         return prev.filter((item) => item.id !== id);
       } else {
-        // Add symptom with initial severity 1 if not selected
         return [...prev, { id, severity: 1 }];
       }
     });
@@ -69,7 +66,7 @@ const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms }) => {
                   <span>Severity: </span>
                   <Form.Select
                     value={selectedSymptom.severity}
-                    onClick={(e) => e.stopPropagation()} // Prevent dropdown click from toggling symptom
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => updateSeverity(symptom.id, e.target.value)}
                     style={styles.severityDropdown}
                   >
@@ -94,7 +91,6 @@ const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms }) => {
   );
 };
 
-// Styles for SymptomsList component
 const styles = {
   symptomsList: {
     marginTop: "20px",
@@ -104,7 +100,7 @@ const styles = {
   },
   symptomsColumn: {
     display: "flex",
-    flexDirection: "column", // Stack items vertically
+    flexDirection: "column",
     gap: "10px",
     marginTop: "10px",
   },

@@ -38,7 +38,6 @@ const SearchBox = () => {
   );
 };
 
-// Inline styling
 const styles = {
   form: {
     display: "flex",
@@ -48,8 +47,7 @@ const styles = {
   },
   inputGroup: {
     width: "400px",
-    borderRadius: "40px",
-    // padding: "0.375rem 0.75rem",    
+    borderRadius: "40px",   
     overflow: "hidden",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
   },

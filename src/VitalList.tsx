@@ -9,7 +9,6 @@ const vitalData = [
   { id: 3, name: 'Temperature' },
   { id: 4, name: 'Oxygen Saturation' },
   { id: 5, name: 'Respiration Rate' },
-  // Add more vital items as needed
 ];
 
 const VitalList = ({ selectedVitals, setSelectedVitals }) => {
@@ -17,10 +16,8 @@ const VitalList = ({ selectedVitals, setSelectedVitals }) => {
     setSelectedVitals((prev) => {
       const alreadySelected = prev.find((item) => item.id === id);
       if (alreadySelected) {
-        // Remove vital if already selected
         return prev.filter((item) => item.id !== id);
       } else {
-        // Add vital with an empty detail field if not selected
         return [...prev, { id, detail: '' }];
       }
     });
@@ -65,7 +62,7 @@ const VitalList = ({ selectedVitals, setSelectedVitals }) => {
                   type="text"
                   value={selectedVital.detail}
                   placeholder="Enter Value"
-                  onClick={(e) => e.stopPropagation()} // Prevent click from toggling selection
+                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => updateDetail(vital.id, e.target.value)}
                   style={styles.detailInput}
                 />
@@ -78,7 +75,6 @@ const VitalList = ({ selectedVitals, setSelectedVitals }) => {
   );
 };
 
-// Styles for VitalList component
 const styles = {
   vitalList: {
     marginTop: '20px',
@@ -88,7 +84,7 @@ const styles = {
   },
   vitalColumn: {
     display: 'flex',
-    flexDirection: 'column', // Stack items vertically
+    flexDirection: 'column',
     gap: '10px',
     marginTop: '10px',
   },
