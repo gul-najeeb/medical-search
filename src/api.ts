@@ -40,6 +40,19 @@ const getVitals = async () => {
 };
 
 
+// 4. Post Health Assessment Data
+const postHealthAssessment = async (assessmentData) => {
+  try {
+    // Send the POST request with the provided data
+    const response = await axios.post(`${BASE_URL}/health-assessment-allfactors`, assessmentData);
+    console.log('Health Assessment Response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting health assessment:', error);
+    throw error; // You can handle this error in the calling function
+  }
+};
 
 
-export { getSymptoms, getPreExistingConditions, getVitals };
+
+export { getSymptoms, getPreExistingConditions, getVitals, postHealthAssessment };

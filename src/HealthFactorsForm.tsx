@@ -1,13 +1,24 @@
 // HealthFactorsForm.js
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Tab, Tabs, Form, Button, Row, Col } from "react-bootstrap";
+import { Tab, Tabs, Form, Button, Row, Col, Modal } from "react-bootstrap";
 import SymptomsList from "./SymptomsList";
 import VitalList from "./VitalList";
 import ExistingConditionList from "./ExistingConditionList";
 import SearchBox from "./SearchBox";
-import { getPreExistingConditions, getSymptoms, getVitals } from "./api";
+import {
+  getPreExistingConditions,
+  getSymptoms,
+  getVitals,
+  postHealthAssessment,
+} from "./api";
 
+const recommendationData = {
+  message: "",
+  recommendedFacility: "",
+  Symptom_Severity_Score: 0,
+  Recommendation_Factor: "",
+};
 const HealthFactorsForm = () => {
   const [selectedTab, setSelectedTab] = useState("allFactors");
   const [gender, setGender] = useState("");
@@ -20,12 +31,17 @@ const HealthFactorsForm = () => {
 
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [selectedVitals, setSelectedVitals] = useState([]);
-  const [Symptoms, setSymptoms] = useState(null)
-  const [PreExistingConditions, setPreExistingConditions] = useState(null)
-  const [Vitals, setVitals] = useState(null)
-  const [Error, setError] = useState('')
-  
-  const [loading, setLoading] = useState(true)
+  const [Symptoms, setSymptoms] = useState(null);
+  const [PreExistingConditions, setPreExistingConditions] = useState(null);
+  const [Vitals, setVitals] = useState(null);
+  const [Error, setError] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false); // State for Modal visibility
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+  const [recommendation, setRecommendation] = useState(recommendationData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,13 +56,30 @@ const HealthFactorsForm = () => {
         ]);
 
         // Set the data to state
-        setSymptoms(symptomsData);
-        setPreExistingConditions(conditionsData);
-        setVitals(vitalsData);
+        // console.log(symptomsData?.symptoms?.map(_ => ({id: _?.Symptom_id, name: _?.Symptom_name })), '')
+
+        setSymptoms(
+          symptomsData?.symptoms?.map((_) => ({
+            id: _?.symptom_id,
+            name: _?.symptom_name,
+          })) || []
+        );
+        setPreExistingConditions(
+          conditionsData?.conditions?.map((_) => ({
+            id: _?.condition_id,
+            name: _?.condition_name,
+          })) || []
+        );
+        setVitals(
+          vitalsData?.vitals?.map((_) => ({
+            id: _?.vital_id,
+            name: _?.vital_name,
+          })) || []
+        );
       } catch (err) {
         // Handle any errors that occur during the API calls
-        setError('Failed to fetch data');
-        console.error('Error fetching health data:', err);
+        setError("Failed to fetch data");
+        console.error("Error fetching health data:", err);
       } finally {
         setLoading(false); // Stop loading
       }
@@ -55,19 +88,71 @@ const HealthFactorsForm = () => {
     fetchData();
   }, []); // Empty dependency array means this effect runs once when the component mounts
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
     setShowSymptoms(true); // Show symptoms list after submitting
 
-    // * API_RESPONSE FROM BE 
-    const facility = 'http://localhost:5173/';
-    location.href =`https://www.google.com/search?q=${facility}&sca_esv=1e8c9acc3ca5315c&sxsrf=ADLYWII0b6mCg7LpTKorbUD9ri-hiCV0XA%3A1731526733834&source=hp&ei=TQA1Z5yJMYj4kdUP24fAoAI&iflsig=AL9hbdgAAAAAZzUOXc9_PyCA3oD6domobgvah41swmJR&ved=0ahUKEwjc44zfh9qJAxUIfKQEHdsDECQQ4dUDCBY&uact=5&oq=${facility}&gs_lp=Egdnd3Mtd2l6Ighob3NwaXRhbDILEAAYgAQYsQMYyQMyBRAAGIAEMggQABiABBixAzILEAAYgAQYkgMYigUyCxAAGIAEGJIDGIoFMggQABiABBixAzIIEAAYgAQYsQMyBRAAGIAEMggQLhiABBixAzIFEAAYgARImQ5Q5wJYgwpwAXgAkAEAmAHxAaAByw2qAQUwLjIuNrgBA8gBAPgBAZgCCaACqw6oAgrCAgcQIxgnGOoCwgIKECMYgAQYJxiKBcICBBAjGCfCAgsQABiABBiRAhiKBcICBRAuGIAEwgIOEAAYgAQYsQMYgwEYigXCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBmAMRkgcFMS4wLjigB8c_&sclient=gws-wiz`
+    // * API_RESPONSE FROM BE
+    const facility = "http://localhost:5173/";
+    // handleShowModal();
+
+    // {
+    //   "gender": "string",
+    //   "ageRange": "string",
+    //   "isSmoker": true,
+    //   "isObese": true,
+    //   "Onlysymptom": true,
+    //   "symptoms": [
+    //     {
+    //       "Symptom_ID": 0,
+    //       "Severity_Number": 0
+    //     }
+    //   ],
+    //   "vitals": [
+    //     {
+    //       "Vital_ID": 0,
+    //       "Vital_Value": "Blood Pressure"
+    //     }
+    //   ],
+    //   "preExistingConditionIDs": [
+    //     0
+    //   ]
+    // }
+    console.log(
+      "Selected Symptoms:",
+      selectedSymptoms,
+      selectedVitals,
+      selectedConditions
+    );
+    postHealthAssessment({
+      gender: gender,
+      ageRange: age,
+      isSmoker: smoker || false,
+      isObese: obese || false,
+      Onlysymptom: true,
+      symptoms: [
+        ...selectedSymptoms.map((symptom) => ({
+          Symptom_ID: symptom.id,
+          Severity_Number: symptom.severity,
+        })),
+      ],
+      vitals: [
+        ...selectedVitals.map((vital) => ({
+          Vital_ID: vital.id,
+          Vital_Value: vital.detail,
+        })),
+      ],
+      preExistingConditionIDs: selectedConditions,
+    }).then((_) => {
+      handleShowModal();
+      setRecommendation(_);
+      console.log(" Hey this which hama", _);
+    });
+
+    // location.href =`https://www.google.com/search?q=${facility}&sca_esv=1e8c9acc3ca5315c&sxsrf=ADLYWII0b6mCg7LpTKorbUD9ri-hiCV0XA%3A1731526733834&source=hp&ei=TQA1Z5yJMYj4kdUP24fAoAI&iflsig=AL9hbdgAAAAAZzUOXc9_PyCA3oD6domobgvah41swmJR&ved=0ahUKEwjc44zfh9qJAxUIfKQEHdsDECQQ4dUDCBY&uact=5&oq=${facility}&gs_lp=Egdnd3Mtd2l6Ighob3NwaXRhbDILEAAYgAQYsQMYyQMyBRAAGIAEMggQABiABBixAzILEAAYgAQYkgMYigUyCxAAGIAEGJIDGIoFMggQABiABBixAzIIEAAYgAQYsQMyBRAAGIAEMggQLhiABBixAzIFEAAYgARImQ5Q5wJYgwpwAXgAkAEAmAHxAaAByw2qAQUwLjIuNrgBA8gBAPgBAZgCCaACqw6oAgrCAgcQIxgnGOoCwgIKECMYgAQYJxiKBcICBBAjGCfCAgsQABiABBiRAhiKBcICBRAuGIAEwgIOEAAYgAQYsQMYgwEYigXCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBmAMRkgcFMS4wLjigB8c_&sclient=gws-wiz`
     // Logging for demonstration
     console.log("Selected Symptoms with Severity:", selectedSymptoms);
   };
-
-
 
   return (
     <div className="p-4" style={styles.container}>
@@ -175,44 +260,26 @@ const HealthFactorsForm = () => {
                 />
               </Col>
             </Form.Group>
-             {/* Submit Button */}
-      {showSymptoms && (
-        <>
-          <SymptomsList
-          symptomsData={ [
-            { id: 1, name: "Cough" },
-            { id: 2, name: "Fever" },
-            { id: 3, name: "Headache" },
-            { id: 4, name: "Sore Throat" },
-            { id: 5, name: "Fatigue" },
-          ]}
-            selectedSymptoms={selectedSymptoms}
-            setSelectedSymptoms={setSelectedSymptoms}
-          />
-          <VitalList
-          vitalData={ [
-            { id: 1, name: 'Blood Pressure' },
-            { id: 2, name: 'Heart Rate' },
-            { id: 3, name: 'Temperature' },
-            { id: 4, name: 'Oxygen Saturation' },
-            { id: 5, name: 'Respiration Rate' },
-          ]}
-            selectedVitals={selectedVitals}
-            setSelectedVitals={setSelectedVitals}
-          />
-            <ExistingConditionList
-            conditionData={ [
-              { id: 1, name: 'Diabetes' },
-              { id: 2, name: 'Hypertension' },
-              { id: 3, name: 'Asthma' },
-              { id: 4, name: 'Heart Disease' },
-              { id: 5, name: 'Chronic Kidney Disease' },
-            ]}
-              selectedConditions={selectedConditions}
-              setSelectedConditions={setSelectedConditions}
-            />
-        </>
-      )}
+            {/* Submit Button */}
+            {showSymptoms && (
+              <>
+                <SymptomsList
+                  symptomsData={Symptoms || []}
+                  selectedSymptoms={selectedSymptoms}
+                  setSelectedSymptoms={setSelectedSymptoms}
+                />
+                <VitalList
+                  vitalData={Vitals || []}
+                  selectedVitals={selectedVitals}
+                  setSelectedVitals={setSelectedVitals}
+                />
+                <ExistingConditionList
+                  conditionData={PreExistingConditions || []}
+                  selectedConditions={selectedConditions}
+                  setSelectedConditions={setSelectedConditions}
+                />
+              </>
+            )}
             <Button variant="primary" type="submit" style={styles.submitButton}>
               Submit
             </Button>
@@ -225,6 +292,148 @@ const HealthFactorsForm = () => {
       </Tabs>
 
       {/* Symptoms List */}
+      {/* Modal for Showing Recommendation */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header
+          closeButton
+          style={{
+            padding: "20px 30px",
+            backgroundColor: "#007bff",
+          }}
+        >
+          <Modal.Title
+            style={{ fontSize: "1.5rem", fontWeight: "600", color: "white" }}
+          >
+            Recommendation Details
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body
+          style={{
+            padding: "20px 30px",
+            fontSize: "1rem",
+            lineHeight: "1.6",
+            backgroundColor: "#f9fafc",
+            color: "#333",
+            // borderTop: "1px solid #e9ecef",
+            // borderBottom: "1px solid #e9ecef",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "1.1rem",
+              fontWeight: "500",
+              color: "#0056b3",
+              marginBottom: "15px",
+            }}
+          >
+            <strong>Message:</strong> {recommendation.message}
+          </p>
+
+          <p
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "10px",
+              fontWeight: "500",
+              color: "#495057",
+            }}
+          >
+            <span>
+              <strong>Recommended Facility:</strong>
+            </span>
+            <span style={{ color: "#007bff", fontWeight: "600" }}>
+              {recommendation.recommendedFacility}
+            </span>
+          </p>
+
+          {recommendation?.Symptom_Severity_Score && (
+            <p
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+                fontWeight: "500",
+                color: "#495057",
+              }}
+            >
+              <span>
+                <strong>Symptom Severity Score:</strong>
+              </span>
+              <span style={{ color: "#007bff", fontWeight: "600" }}>
+                {recommendation.Symptom_Severity_Score}
+              </span>
+            </p>
+          )}
+          {recommendation?.risk_factor_score && (
+            <p
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+                fontWeight: "500",
+                color: "#495057",
+              }}
+            >
+              <span>
+                <strong>Risk Factor Score:</strong>
+              </span>
+              <span style={{ color: "#007bff", fontWeight: "600" }}>
+                {recommendation.risk_factor_score}
+              </span>
+            </p>
+          )}
+          {recommendation?.Wieghtage && (
+            <p
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+                fontWeight: "500",
+                color: "#495057",
+              }}
+            >
+              <span>
+                <strong>Wieghtage:</strong>
+              </span>
+              <span style={{ color: "#007bff", fontWeight: "600" }}>
+                {recommendation.Wieghtage * 100}%
+              </span>
+            </p>
+          )}
+          <p
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontWeight: "500",
+              color: "#495057",
+            }}
+          >
+            <span>
+              <strong>Recommendation Factor:</strong>
+            </span>
+            <span style={{ color: "#007bff", fontWeight: "600" }}>
+              {recommendation.Recommendation_Factor}
+            </span>
+          </p>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="success"
+            onClick={() => {
+              // alert(`Navigating to ${recommendationData.recommendedFacility}`)
+              if (recommendation?.recommendedFacility)
+                window.open(
+                  `https://www.google.com/search?q=${'Near By '+recommendation.recommendedFacility}&sca_esv=1e8c9acc3ca5315c&sxsrf=ADLYWII0b6mCg7LpTKorbUD9ri-hiCV0XA%3A1731526733834&source=hp&ei=TQA1Z5yJMYj4kdUP24fAoAI&iflsig=AL9hbdgAAAAAZzUOXc9_PyCA3oD6domobgvah41swmJR&ved=0ahUKEwjc44zfh9qJAxUIfKQEHdsDECQQ4dUDCBY&uact=5&oq=${'Near By '+recommendationData.recommendedFacility}&gs_lp=Egdnd3Mtd2l6Ighob3NwaXRhbDILEAAYgAQYsQMYyQMyBRAAGIAEMggQABiABBixAzILEAAYgAQYkgMYigUyCxAAGIAEGJIDGIoFMggQABiABBixAzIIEAAYgAQYsQMyBRAAGIAEMggQLhiABBixAzIFEAAYgARImQ5Q5wJYgwpwAXgAkAEAmAHxAaAByw2qAQUwLjIuNrgBA8gBAPgBAZgCCaACqw6oAgrCAgcQIxgnGOoCwgIKECMYgAQYJxiKBcICBBAjGCfCAgsQABiABBiRAhiKBcICBRAuGIAEwgIOEAAYgAQYsQMYgwEYigXCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBmAMRkgcFMS4wLjigB8c_&sclient=gws-wiz`,
+                  "_blank"
+                );
+            }}
+          >
+            Recommended Facility
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
