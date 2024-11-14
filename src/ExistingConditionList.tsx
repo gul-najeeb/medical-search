@@ -1,15 +1,8 @@
   import { FaRegCheckCircle } from "react-icons/fa";
 
 
-const conditionData = [
-  { id: 1, name: 'Diabetes' },
-  { id: 2, name: 'Hypertension' },
-  { id: 3, name: 'Asthma' },
-  { id: 4, name: 'Heart Disease' },
-  { id: 5, name: 'Chronic Kidney Disease' },
-];
-
-const ExistingConditionList = ({ selectedConditions, setSelectedConditions }) => {
+ 
+const ExistingConditionList = ({ selectedConditions, setSelectedConditions, conditionData }) => {
   const toggleCondition = (id) => {
     setSelectedConditions((prev) => {
       if (prev.includes(id)) {

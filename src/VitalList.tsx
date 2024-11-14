@@ -3,15 +3,8 @@
 
 import { Form } from 'react-bootstrap';
 
-const vitalData = [
-  { id: 1, name: 'Blood Pressure' },
-  { id: 2, name: 'Heart Rate' },
-  { id: 3, name: 'Temperature' },
-  { id: 4, name: 'Oxygen Saturation' },
-  { id: 5, name: 'Respiration Rate' },
-];
-
-const VitalList = ({ selectedVitals, setSelectedVitals }) => {
+ 
+const VitalList = ({ selectedVitals, setSelectedVitals, vitalData }) => {
   const toggleVital = (id) => {
     setSelectedVitals((prev) => {
       const alreadySelected = prev.find((item) => item.id === id);

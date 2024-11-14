@@ -2,16 +2,9 @@
  import { FaRegCheckCircle } from "react-icons/fa";
   
 import { Form } from "react-bootstrap";
+ 
 
-const symptomsData = [
-  { id: 1, name: "Cough" },
-  { id: 2, name: "Fever" },
-  { id: 3, name: "Headache" },
-  { id: 4, name: "Sore Throat" },
-  { id: 5, name: "Fatigue" },
-];
-
-const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms }) => {
+const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms, symptomsData }) => {
   const toggleSymptom = (id) => {
     setSelectedSymptoms((prev) => {
       const alreadySelected = prev.find((item) => item.id === id);
