@@ -13,12 +13,78 @@ import { Button, Modal } from "react-bootstrap";
 const API_KEY = "AIzaSyB7LKWE4Rr0Xl7Rmj6mohtUagGR93of60s";
 
 const mapContainerStyle = {
-  width: "50%",
+  width: "68%",
   height: "600px",
 };
-type Place = google.maps.places.PlaceResult;
+export type Place = google.maps.places.PlaceResult;
 
-const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
+const placesStyles = {
+  container: {
+    overflowY: 'scroll',
+    height: '40rem',
+    maxWidth: "420px",
+
+    //   margin: "auto",
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
+    backgroundColor: "#f7f7f7",
+    color: "#333",
+  },
+  header: {
+    fontSize: "24px",
+    fontWeight: "600",
+    marginBottom: "20px",
+    textAlign: "center",
+    color: "#333",
+  },
+  placeItem: {
+    backgroundColor: "#ffffff",
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    padding: "16px",
+    marginBottom: "15px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    transition: "transform 0.3s ease",
+    cursor: "pointer",
+  },
+  placeDetails: {
+    maxWidth: "70%",
+  },
+  placeName: {
+    fontSize: "18px",
+    fontWeight: "600",
+    color: "#333",
+  },
+  placeAddress: {
+    fontSize: "15px",
+    color: "#777",
+    margin: "5px 0",
+  },
+  placeRating: {
+    fontSize: "14px",
+    color: "#777",
+    margin: "5px 0",
+  },
+  ratingHighlight: {
+    color: "#f4b400",
+    fontWeight: "600",
+  },
+  directionsButton: {
+    fontSize: "14px",
+    padding: "8px 12px",
+    backgroundColor: "#007bff",
+    color: "#ffffff",
+    border: "none",
+
+    borderRadius: "6px",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+  },
+};
+
+const NearbyPlacesMap = ({ searchQuery = "Clinic", showFacilitiesOnMap }) => {
   const [center, setCenter] = useState({ lat: "", lng: "" });
   const [map, setMap] = useState(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -34,6 +100,7 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
   };
 
   const handleCloseModal = () => {
+    // window.location.reload()
     setModalVisible(false);
     setSelectedPlace(null);
   };
@@ -53,6 +120,7 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
     }
   }, []);
 
+  // console.log(searchQuery)
   useEffect(() => {
     if (map && center && searchQuery) {
       const service = new window.google.maps.places.PlacesService(map);
@@ -70,7 +138,7 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
         }
       });
     }
-  }, [map, center, searchQuery]);
+  }, [map, center, searchQuery, showFacilitiesOnMap]);
 
   const handleLoad = (mapInstance) => {
     setMap(mapInstance);
@@ -102,11 +170,47 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
   if (!center) {
     return <p>Loading map and fetching your location...</p>;
   }
+  if (!showFacilitiesOnMap) {
+    return null;
+  }
 
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
-      <Places places={places || []} />
-      <LoadScript googleMapsApiKey={API_KEY} libraries={["places"]}>
+      <div style={placesStyles.container}>
+        <h2 style={placesStyles.header}>Nearby Facilities</h2>
+        {places.map((place: Place, index) => {
+          console.log(place)
+          return (
+            <div
+              key={index}
+              style={{
+                ...placesStyles.placeItem,
+                transform: place.hover ? "translateY(-3px)" : "none",
+              }}
+              onMouseEnter={() => (place.hover = true)}
+              onMouseLeave={() => (place.hover = false)}
+            >
+              <div style={placesStyles.placeDetails}>
+                <h3 style={placesStyles.placeName}>{place?.name}</h3>
+                <p style={placesStyles.placeAddress}>{place?.vicinity}</p>
+
+
+                <p style={placesStyles.placeRating}>
+                  Rating: <span style={placesStyles.ratingHighlight}>{place.rating}</span>{" "}
+                  ⭐
+                </p>
+                <p style={placesStyles.placeRating}>
+                  Total Ratings: <span style={placesStyles.ratingHighlight}>{place.user_ratings_total}</span>{" "}
+                  ⭐
+                </p>
+                <p style={{ ...placesStyles.placeAddress, fontWeight: 'bold' }}>Place Type: {place.types?.join(', ')}</p>
+              </div>
+              <button onClick={() => handleMarkerClick(place)}
+                style={{ ...placesStyles.directionsButton, alignSelf: 'start', marginTop: '1rem' }}>View Place</button>
+            </div>
+          )
+        })}
+      </div>      <LoadScript googleMapsApiKey={API_KEY} libraries={["places"]}>
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={center}
@@ -118,10 +222,10 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
               key={place.place_id}
               position={place.geometry.location}
               onClick={() => handleMarkerClick(place)}
-              // onClick={() => {
-              //   setSelectedPlace(place);
-              //   handleDirections(place);
-              // }}
+            // onClick={() => {
+            //   setSelectedPlace(place);
+            //   handleDirections(place);
+            // }}
             />
           ))}
 
@@ -129,7 +233,7 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
         </GoogleMap>
       </LoadScript>
       {/* Modal for displaying hospital details */}
- 
+
 
       <Modal centered show={modalVisible} onHide={handleCloseModal}>
         <Modal.Header closeButton>
@@ -165,7 +269,7 @@ const NearbyPlacesMap = ({ searchQuery = "Clinic" }) => {
             </p>
             <p style={{ margin: "8px 0" }}>
               <strong>Rating:</strong> {selectedPlace.rating || ''} ⭐ (
-              {selectedPlace?.user_ratings_total || ''} reviews)
+              {selectedPlace?.user_ratings_total || '0'} reviews)
             </p>
             <p style={{ margin: "8px 0" }}>
               <strong>Vicinity:</strong> {selectedPlace?.vicinity || ''}

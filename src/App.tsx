@@ -15,9 +15,9 @@ function App() {
 
   return (
     <div className="container" style={{ marginTop: "5.4rem" }}>
-      {/* <HealthFactorsForm /> */}
-      <NearbyPlacesMap/>  
-      {/* <Places /> */}
+      <HealthFactorsForm />
+      {/* <NearbyPlacesMap/> */}
+       {/* <Places /> */}
     </div>
   );
 }

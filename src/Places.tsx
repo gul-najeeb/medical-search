@@ -1,4 +1,5 @@
 import React from "react";
+import { Place } from "./NearbyPlacesMap";
 
 export default function Places({
   places = [
@@ -19,13 +20,13 @@ export default function Places({
     },
   ],
 }) {
-  const styles = {
+  const placesStyles = {
     container: {
-        overflowY: 'scroll',
-        height: '40rem',
-      maxWidth: "470px",
-      
-    //   margin: "auto",
+      overflowY: 'scroll',
+      height: '40rem',
+      maxWidth: "420px",
+
+      //   margin: "auto",
       padding: "20px",
       fontFamily: "Arial, sans-serif",
       backgroundColor: "#f7f7f7",
@@ -59,7 +60,7 @@ export default function Places({
       color: "#333",
     },
     placeAddress: {
-      fontSize: "14px",
+      fontSize: "15px",
       color: "#777",
       margin: "5px 0",
     },
@@ -78,6 +79,7 @@ export default function Places({
       backgroundColor: "#007bff",
       color: "#ffffff",
       border: "none",
+      
       borderRadius: "6px",
       cursor: "pointer",
       transition: "background-color 0.3s ease",
@@ -85,48 +87,39 @@ export default function Places({
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.header}>Nearby Hospitals</h2>
-      {places.map((place, index) => (
-        <div
-          key={index}
-          style={{
-            ...styles.placeItem,
-            transform: place.hover ? "translateY(-3px)" : "none",
-          }}
-          onMouseEnter={() => (place.hover = true)}
-          onMouseLeave={() => (place.hover = false)}
-        >
-          <div style={styles.placeDetails}>
-            <h3 style={styles.placeName}>{place.name}</h3>
-            <p style={styles.placeAddress}>{place.address}</p>
-            <p style={styles.placeRating}>
-              Rating: <span style={styles.ratingHighlight}>{place.rating}</span>{" "}
-              ⭐
-            </p>
+    <div style={placesStyles.container}>
+      <h2 style={placesStyles.header}>Nearby Hospitals</h2>
+      {places.map((place: Place, index) => {
+        console.log(place)
+        return (
+          <div
+            key={index}
+            style={{
+              ...placesStyles.placeItem,
+              transform: place.hover ? "translateY(-3px)" : "none",
+            }}
+            onMouseEnter={() => (place.hover = true)}
+            onMouseLeave={() => (place.hover = false)}
+          >
+            <div style={placesStyles.placeDetails}>
+              <h3 style={placesStyles.placeName}>{place?.name}</h3>
+              <p style={placesStyles.placeAddress}>{place?.vicinity}</p>
+ 
+ 
+              <p style={placesStyles.placeRating}>
+                Rating: <span style={placesStyles.ratingHighlight}>{place.rating}</span>{" "}
+                ⭐
+              </p>
+              <p style={placesStyles.placeRating}>
+                Total Ratings: <span style={placesStyles.ratingHighlight}>{place.user_ratings_total}</span>{" "}
+                ⭐
+              </p>
+                <p style={{...placesStyles.placeAddress, fontWeight: 'bold'}}>Place Type: {place.types?.join(', ')}</p>
+            </div>
+            <button style={{...placesStyles.directionsButton, alignSelf: 'start', marginTop: '1rem'}}>Directions</button>
           </div>
-          <button style={styles.directionsButton}>Directions</button>
-        </div>
-      ))}
+        )
+      })}
     </div>
   );
-}
-
-// Sample usage of NearbyHospitalsList component
-const samplePlaces = [
-  {
-    name: "St. Elizabeth Hospital",
-    address: "99F4+3GM, Hyderabad, Pakistan",
-    rating: "3.9",
-  },
-  {
-    name: "Maa Jee Hospital",
-    address: "99F7+GCF, Hyderabad, Pakistan",
-    rating: "4.0",
-  },
-  {
-    name: "American Hospital",
-    address: "99J9+MQ8, Hyderabad, Pakistan",
-    rating: "3.0",
-  },
-];
+}  

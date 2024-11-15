@@ -12,6 +12,7 @@ import {
   getVitals,
   postHealthAssessment,
 } from "./api";
+import NearbyPlacesMap from "./NearbyPlacesMap";
 
 const recommendationData = {
   message: "",
@@ -38,10 +39,15 @@ const HealthFactorsForm = () => {
 
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false); // State for Modal visibility
+  const [modalSize, setModalSize] = useState<'sm' | 'xl' | 'lg' | ''>('')
 
   const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  const handleCloseModal = () => {
+    window.location.reload()
+    setShowModal(false)
+  };
   const [recommendation, setRecommendation] = useState(recommendationData);
+  const [showFacilitiesOnMap, setShowFacilitiesOnMap] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -293,7 +299,7 @@ const HealthFactorsForm = () => {
 
       {/* Symptoms List */}
       {/* Modal for Showing Recommendation */}
-      <Modal show={showModal} onHide={handleCloseModal} centered>
+      <Modal show={showModal} size={modalSize} onHide={handleCloseModal} centered>
         <Modal.Header
           closeButton
           style={{
@@ -340,7 +346,7 @@ const HealthFactorsForm = () => {
             }}
           >
             <span>
-              <strong>Recommended Facility:</strong>
+              <strong>Recommend Facility:</strong>
             </span>
             <span style={{ color: "#007bff", fontWeight: "600" }}>
               {recommendation.recommendedFacility}
@@ -416,24 +422,28 @@ const HealthFactorsForm = () => {
               {recommendation.Recommendation_Factor}
             </span>
           </p>
+          <NearbyPlacesMap showFacilitiesOnMap={showFacilitiesOnMap} searchQuery={recommendation?.recommendedFacility} />
         </Modal.Body>
 
         <Modal.Footer>
           <Button
-            variant="success"
+            hidden={showFacilitiesOnMap}
+            // variant=""
             onClick={() => {
               // alert(`Navigating to ${recommendationData.recommendedFacility}`)
-
+              setModalSize('xl')
+              setShowFacilitiesOnMap(true)
+              return;
 
               // * On Recommendation (We Should Trigger the Maps and near by places!)
               if (recommendation?.recommendedFacility)
                 window.open(
-                  `https://www.google.com/search?q=${'Near By '+recommendation.recommendedFacility}&sca_esv=1e8c9acc3ca5315c&sxsrf=ADLYWII0b6mCg7LpTKorbUD9ri-hiCV0XA%3A1731526733834&source=hp&ei=TQA1Z5yJMYj4kdUP24fAoAI&iflsig=AL9hbdgAAAAAZzUOXc9_PyCA3oD6domobgvah41swmJR&ved=0ahUKEwjc44zfh9qJAxUIfKQEHdsDECQQ4dUDCBY&uact=5&oq=${'Near By '+recommendationData.recommendedFacility}&gs_lp=Egdnd3Mtd2l6Ighob3NwaXRhbDILEAAYgAQYsQMYyQMyBRAAGIAEMggQABiABBixAzILEAAYgAQYkgMYigUyCxAAGIAEGJIDGIoFMggQABiABBixAzIIEAAYgAQYsQMyBRAAGIAEMggQLhiABBixAzIFEAAYgARImQ5Q5wJYgwpwAXgAkAEAmAHxAaAByw2qAQUwLjIuNrgBA8gBAPgBAZgCCaACqw6oAgrCAgcQIxgnGOoCwgIKECMYgAQYJxiKBcICBBAjGCfCAgsQABiABBiRAhiKBcICBRAuGIAEwgIOEAAYgAQYsQMYgwEYigXCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBmAMRkgcFMS4wLjigB8c_&sclient=gws-wiz`,
+                  `https://www.google.com/search?q=${'Near By ' + recommendation.recommendedFacility}&sca_esv=1e8c9acc3ca5315c&sxsrf=ADLYWII0b6mCg7LpTKorbUD9ri-hiCV0XA%3A1731526733834&source=hp&ei=TQA1Z5yJMYj4kdUP24fAoAI&iflsig=AL9hbdgAAAAAZzUOXc9_PyCA3oD6domobgvah41swmJR&ved=0ahUKEwjc44zfh9qJAxUIfKQEHdsDECQQ4dUDCBY&uact=5&oq=${'Near By ' + recommendationData.recommendedFacility}&gs_lp=Egdnd3Mtd2l6Ighob3NwaXRhbDILEAAYgAQYsQMYyQMyBRAAGIAEMggQABiABBixAzILEAAYgAQYkgMYigUyCxAAGIAEGJIDGIoFMggQABiABBixAzIIEAAYgAQYsQMyBRAAGIAEMggQLhiABBixAzIFEAAYgARImQ5Q5wJYgwpwAXgAkAEAmAHxAaAByw2qAQUwLjIuNrgBA8gBAPgBAZgCCaACqw6oAgrCAgcQIxgnGOoCwgIKECMYgAQYJxiKBcICBBAjGCfCAgsQABiABBiRAhiKBcICBRAuGIAEwgIOEAAYgAQYsQMYgwEYigXCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBmAMRkgcFMS4wLjigB8c_&sclient=gws-wiz`,
                   "_blank"
                 );
             }}
           >
-            Recommended Facility
+            Click To See Recommended Facility
           </Button>
         </Modal.Footer>
       </Modal>
