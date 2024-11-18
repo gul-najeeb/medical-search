@@ -52,6 +52,8 @@ const SymptomsList = ({ selectedSymptoms, setSelectedSymptoms, symptomsData }) =
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           style={styles.filterInput}
+          className="mb-4"
+
         />
         {filteredUnselectedList.length > 0 ? (
           <div style={styles.symptomsColumn}>

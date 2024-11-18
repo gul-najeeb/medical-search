@@ -38,6 +38,8 @@ const ExistingConditionList = ({
         <h5>Choose Conditions:</h5>
         <Form.Control
           type="text"
+          className="mb-4"
+
           placeholder="Search Existing Conditions"
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}

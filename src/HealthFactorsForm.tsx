@@ -454,7 +454,7 @@ const HealthFactorsForm = () => {
 // Inline styling
 const styles = {
   container: {
-    maxWidth: "900px",
+    maxWidth: "1170px",
     margin: "auto",
     backgroundColor: "#f8f9fa",
     padding: "20px",

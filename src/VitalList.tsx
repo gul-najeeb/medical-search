@@ -43,6 +43,7 @@ const VitalList = ({ selectedVitals, setSelectedVitals, vitalData }) => {
           type="text"
           placeholder="Search Vitals"
           value={filterText}
+          className="mb-4"
           onChange={(e) => setFilterText(e.target.value)}
           style={styles.filterInput}
         />
