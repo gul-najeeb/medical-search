@@ -293,7 +293,118 @@ const HealthFactorsForm = () => {
         </Tab>
 
         <Tab eventKey="symptomsOnly" title="Symptoms Only">
-          <p>Select symptoms and provide details here...</p>
+          <Form onSubmit={handleSubmit}>
+            {/* Gender Dropdown */}
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm="3">
+                Gender
+              </Form.Label>
+              <Col sm="9">
+                <Form.Select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  style={styles.dropdown}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </Form.Select>
+              </Col>
+            </Form.Group>
+
+            {/* Age Dropdown */}
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm="3">
+                Age
+              </Form.Label>
+              <Col sm="9">
+                <Form.Select
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  style={styles.dropdown}
+                >
+                  <option value="">Select Age Range</option>
+                  <option value="20-29">20-29</option>
+                  <option value="30-39">30-39</option>
+                  <option value="40-59">40-59</option>
+                  <option value="60-79">60-79</option>
+                  <option value="80+">80+</option>
+                </Form.Select>
+              </Col>
+            </Form.Group>
+
+            {/* Smoker Radio Buttons */}
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm="3">
+                Smoker
+              </Form.Label>
+              <Col sm="9">
+                <Form.Check
+                  inline
+                  label="Yes"
+                  name="smoker"
+                  type="radio"
+                  id="smoker-yes"
+                  value="Yes"
+                  checked={smoker === "Yes"}
+                  onChange={(e) => setSmoker(e.target.value)}
+                />
+                <Form.Check
+                  inline
+                  label="No"
+                  name="smoker"
+                  type="radio"
+                  id="smoker-no"
+                  value="No"
+                  checked={smoker === "No"}
+                  onChange={(e) => setSmoker(e.target.value)}
+                />
+              </Col>
+            </Form.Group>
+
+            {/* Obese Radio Buttons */}
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm="3">
+                Obese
+              </Form.Label>
+              <Col sm="9">
+                <Form.Check
+                  inline
+                  label="Yes"
+                  name="obese"
+                  type="radio"
+                  id="obese-yes"
+                  value="Yes"
+                  checked={obese === "Yes"}
+                  onChange={(e) => setObese(e.target.value)}
+                />
+                <Form.Check
+                  inline
+                  label="No"
+                  name="obese"
+                  type="radio"
+                  id="obese-no"
+                  value="No"
+                  checked={obese === "No"}
+                  onChange={(e) => setObese(e.target.value)}
+                />
+              </Col>
+            </Form.Group>
+            {/* Submit Button */}
+            {showSymptoms && (
+              <>
+                <SymptomsList
+                  symptomsData={Symptoms || []}
+                  selectedSymptoms={selectedSymptoms}
+                  setSelectedSymptoms={setSelectedSymptoms}
+                />
+
+              </>
+            )}
+            <Button variant="primary" type="submit" style={styles.submitButton}>
+              Submit
+            </Button>
+          </Form>
         </Tab>
       </Tabs>
 
